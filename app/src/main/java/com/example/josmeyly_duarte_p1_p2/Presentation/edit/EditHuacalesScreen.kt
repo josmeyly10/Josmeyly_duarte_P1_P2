@@ -79,8 +79,9 @@ fun EditHuacalesBody(
     }
 }
 @Composable
-private fun EditHucalesBodyPreview(){
-    val state = EditHucalesUiState()
+private fun EditHuacalesBodyPreview() {
+    val state = EditHuacalesUiState()
     MaterialTheme {
-        EditHucalesBody(state = state) { }
+        EditHuacalesBody(state = state) { }
     }
+}
