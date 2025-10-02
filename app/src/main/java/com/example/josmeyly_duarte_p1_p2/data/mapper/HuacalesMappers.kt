@@ -2,9 +2,9 @@ package com.example.josmeyly_duarte_p1_p2.data.mapper
 
 import com.example.josmeyly_duarte_p1_p2.data.local.entities.HuacalesEntity
 import com.example.josmeyly_duarte_p1_p2.domain.model.Huacales
-import com.example.josmeyly_duarte_p1_p2.data.mapper.toDomain
 
-fun Huacales.toDomain(): Huacales = Huacales(
+
+fun HuacalesEntity.toDomain(): Huacales = Huacales(
     IdEntrada = IdEntrada ?: 0,
     NombreCliente = NombreCliente,
     Fecha = Fecha,

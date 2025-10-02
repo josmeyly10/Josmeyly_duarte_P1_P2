@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.josmeyly_duarte_p1_p2.data.local.database.HuacalesDb
 
+
 import com.example.josmeyly_duarte_p1_p2.domain.model.Huacales
 import dagger.Module
 import dagger.Provides
@@ -25,5 +26,5 @@ object ApiModule {
         ).fallbackToDestructiveMigration()
             .build()
     @Provides
-    fun provideHuacalesDao(huacalesDb: HuacalesDb) = huacalesDb.hucalesDao()
+    fun provideHuacalesDao(huacalesDb: HuacalesDb) = huacalesDb.huacalesDao()
 }

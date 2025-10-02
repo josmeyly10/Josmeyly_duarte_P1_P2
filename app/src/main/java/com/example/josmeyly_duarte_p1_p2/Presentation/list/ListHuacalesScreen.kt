@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -56,7 +57,7 @@ fun ListHuacalesBody(
                 .testTag("hucales_list")
         ) {
             items(state.huacales) { huacales ->
-                huacales(
+                HuacalesCard(
                     huacales= huacales,
                     onEdit = { onEvent(ListHuacalesUiEvent.Edit(huacales.IdEntrada)) },
                     onDelete = { onEvent(ListHuacalesUiEvent.Delete(huacales.IdEntrada)) }
