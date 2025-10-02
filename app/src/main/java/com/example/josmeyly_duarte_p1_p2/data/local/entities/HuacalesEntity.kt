@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
         @PrimaryKey
         val IdEntrada: Int? = null,
         val NombreCliente: String = "",
-        val Fecha: Int = 0,
+        val Fecha: String =  "",
         val Cantidad: Int = 0,
         val Precio: Int = 0,
 

@@ -32,7 +32,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
             Josmeyly_duarte_P1_P2Theme {
                 val editViewModel: EditHuacalesViewModel = hiltViewModel()

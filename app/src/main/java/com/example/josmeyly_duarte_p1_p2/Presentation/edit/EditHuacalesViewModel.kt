@@ -2,14 +2,15 @@ package com.example.josmeyly_duarte_p1_p2.Presentation.edit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.copy
 import com.example.josmeyly_duarte_p1_p2.domain.model.Huacales
 import com.example.josmeyly_duarte_p1_p2.domain.usecase.DeleteHuacalesUseCase
 import com.example.josmeyly_duarte_p1_p2.domain.usecase.ExisteHuacalesUseCase
 import com.example.josmeyly_duarte_p1_p2.domain.usecase.GetHuacalesUseCase
 import com.example.josmeyly_duarte_p1_p2.domain.usecase.UpsertHuacalesUseCase
 import com.example.josmeyly_duarte_p1_p2.domain.usecase.validateCantidad
+import com.example.josmeyly_duarte_p1_p2.domain.usecase.validateFecha
 import com.example.josmeyly_duarte_p1_p2.domain.usecase.validateNombreCliente
+import com.example.josmeyly_duarte_p1_p2.domain.usecase.validatePrecio
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,21 +26,25 @@ class EditHuacalesViewModel @Inject constructor(
     private val deleteHuacalesUseCase: DeleteHuacalesUseCase,
     private val existeHuacalesUseCase: ExisteHuacalesUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow(value = EditHuacalesUiState())
 
+    private val _state = MutableStateFlow(EditHuacalesUiState())
     val state: StateFlow<EditHuacalesUiState> = _state.asStateFlow()
 
     fun onEvent(event: EditHuacalesUiEvent) {
         when (event) {
-            is EditHuacalesUiEvent.Load -> onLoad(id = event.id)
+            is EditHuacalesUiEvent.Load -> onLoad(event.id)
             is EditHuacalesUiEvent.NombreClienteChanged -> _state.update {
-                it.copy(nombrecliente = event.value, nombreError = null)
+                it.copy(nombrecliente = event.value, nombreclienteError = null)
             }
-
             is EditHuacalesUiEvent.CantidadChanged -> _state.update {
                 it.copy(cantidad = event.value, cantidadError = null)
             }
-
+            is EditHuacalesUiEvent.FechaChanged -> _state.update {
+                it.copy(fecha = event.value, fechaError = null)
+            }
+            is EditHuacalesUiEvent.PrecioChanged -> _state.update {
+                it.copy(precio = event.value, precioError = null)
+            }
             EditHuacalesUiEvent.Save -> onSave()
             EditHuacalesUiEvent.Delete -> onDelete()
         }
@@ -47,7 +52,7 @@ class EditHuacalesViewModel @Inject constructor(
 
     private fun onLoad(id: Int?) {
         if (id == null || id == 0) {
-            _state.update { it.copy(isNew = true, jugadorId = null) }
+            _state.update { it.copy(isNew = true, IdEntrada = null) }
             return
         }
         viewModelScope.launch {
@@ -56,9 +61,11 @@ class EditHuacalesViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isNew = false,
-                        IdEntrada= huacales.IdEntrada,
-                        nombrecliente = huacales.NombreCliennte,
-                        cantidad = huacales.Cantidad.toString()
+                        IdEntrada = huacales.IdEntrada,
+                        nombrecliente = huacales.NombreCliente,
+                        cantidad = huacales.Cantidad.toString(),
+                        fecha = huacales.Fecha,
+                        precio = huacales.Precio.toString()
                     )
                 }
             }
@@ -67,15 +74,27 @@ class EditHuacalesViewModel @Inject constructor(
 
     private fun onSave() {
         val nombrecliente = state.value.nombrecliente
-        val nombresValidations = validateNombreCliente(nombrecliente)
         val cantidad = state.value.cantidad
-        val p = validateCantidad(cantidad)
+        val fecha = state.value.fecha
+        val precio = state.value.precio
 
-        if (!nombresValidations.isValid || !p.isValid) {
+        val nombreValidation = validateNombreCliente(nombrecliente)
+        val cantidadValidation = validateCantidad(cantidad)
+        val fechaValidation = validateFecha(fecha)
+        val precioValidation = validatePrecio(precio)
+
+
+        if (!nombreValidation.isValid ||
+            !cantidadValidation.isValid ||
+            !fechaValidation.isValid ||
+            !precioValidation.isValid
+        ) {
             _state.update {
                 it.copy(
-                    nombreclienteError = nombreclienteValidations.error,
-                    cantidadError = p.error
+                    nombreclienteError = nombreValidation.error,
+                    cantidadError = cantidadValidation.error,
+                    fechaError = fechaValidation.error,
+                    precioError = precioValidation.error
                 )
             }
             return
@@ -83,26 +102,28 @@ class EditHuacalesViewModel @Inject constructor(
 
         viewModelScope.launch {
             val currentId = state.value.IdEntrada
-            if (existeNombreClienteUseCase(nombrecliente, currentId)) {
+            if (existeHuacalesUseCase(nombrecliente, currentId)) {
                 _state.update {
-                    it.copy(
-                        nombreError = "Ya existe un cliente con ese nombre"
-                    )
+                    it.copy(nombreclienteError = "Ya existe un cliente con ese nombre")
                 }
                 return@launch
             }
 
             _state.update { it.copy(isSaving = true) }
-            val id = state.value.IdEntrada ?: 0
+
             val huacales = Huacales(
-                IdEntrada = id,
+                IdEntrada = currentId ?: 0,
                 NombreCliente = nombrecliente,
-                Cantidad = cantidad.toInt()
+                Cantidad = cantidad.toInt(),
+                Fecha = fecha,
+                Precio = precio.toInt(),
             )
+
             val result = upsertHuacalesUseCase(huacales)
-            result.onSuccess { newId ->
+
+            result.onSuccess {
                 _state.value = EditHuacalesUiState()
-            }.onFailure { e ->
+            }.onFailure {
                 _state.update { it.copy(isSaving = false) }
             }
         }

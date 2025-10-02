@@ -1,14 +1,14 @@
 package com.example.josmeyly_duarte_p1_p2.Presentation.edit
 
-interface EditHuacalesUiEvent {
+sealed class EditHuacalesUiEvent {
+    data class Load(val id: Int?) : EditHuacalesUiEvent()
+    data class NombreClienteChanged(val value: String) : EditHuacalesUiEvent()
+    data class CantidadChanged(val value: String) : EditHuacalesUiEvent()
+    data class FechaChanged(val value: String) : EditHuacalesUiEvent()
+    data class PrecioChanged(val value: String) : EditHuacalesUiEvent()
 
-    data class Load(val id: Int?) : EditHuacalesUiEvent
+    data class Edit(val id: Int) : EditHuacalesUiEvent()
+    object Save : EditHuacalesUiEvent()
+    object Delete : EditHuacalesUiEvent()
 
-    data class NombreClienteChanged(val value: String) : EditHuacalesUiEvent
-
-    data class CantidadChanged(val value: String) : EditHuacalesUiEvent
-
-    data object Save : EditHuacalesUiEvent
-
-    data object Delete : EditHuacalesUiEvent
 }

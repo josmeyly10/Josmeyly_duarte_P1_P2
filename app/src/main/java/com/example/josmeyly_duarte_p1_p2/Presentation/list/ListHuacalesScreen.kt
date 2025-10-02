@@ -39,10 +39,7 @@ fun ListHuacalesBody(
     state: ListHuacalesUiState,
     onEvent: (ListHuacalesUiEvent) -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         if (state.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier
@@ -54,13 +51,13 @@ fun ListHuacalesBody(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .testTag("hucales_list")
+                .testTag("huacales_list")
         ) {
-            items(state.huacales) { huacales ->
+            items(state.huacales) { huacal ->
                 HuacalesCard(
-                    huacales= huacales,
-                    onEdit = { onEvent(ListHuacalesUiEvent.Edit(huacales.IdEntrada)) },
-                    onDelete = { onEvent(ListHuacalesUiEvent.Delete(huacales.IdEntrada)) }
+                    huacales = huacal,
+                    onEdit = { onEvent(ListHuacalesUiEvent.Edit(huacal.     IdEntrada)) },
+                    onDelete = { onEvent(ListHuacalesUiEvent.Delete(huacal.IdEntrada)) }
                 )
             }
         }
@@ -93,24 +90,26 @@ fun HuacalesCard(
             TextButton(
                 onClick = onEdit,
                 modifier = Modifier.testTag("edit_button_${huacales.IdEntrada}")
-            ) {
-                Text("Editar")
-            }
+            ) { Text("Editar") }
             TextButton(
                 onClick = onDelete,
                 modifier = Modifier.testTag("delete_button_${huacales.IdEntrada}")
-            ) {
-                Text("Eliminar")
-            }
+            ) { Text("Eliminar") }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun ListHuacalesBodyPreview() {
+    val state = ListHuacalesUiState(
+        huacales = listOf(
+            Huacales(1, "Juan", 5),
+            Huacales(2, "Maria", 10)
+        ),
+        isLoading = false
+    )
     MaterialTheme {
-        val state = ListHuacalesUiState()
-        ListHuacalesBody(state) { }
+        ListHuacalesBody(state) {}
     }
 }

@@ -8,10 +8,11 @@ class UpsertHuacalesUseCase @Inject constructor(
     private val repository: HuacalesRepository
 ) {
     suspend operator fun invoke(huacales: Huacales): Result<Int> {
-        val nombreclienteResult = validateNombreCliente(Huacales.NombreCliente)
+        val nombreclienteResult = validateNombreCliente(huacales.NombreCliente)
         if (!nombreclienteResult.isValid) {
             return Result.failure(IllegalArgumentException(nombreclienteResult.error))
         }
+
         val cantidadResult = validateCantidad(huacales.Cantidad.toString())
         if (!cantidadResult.isValid) {
             return Result.failure(IllegalArgumentException(cantidadResult.error))
