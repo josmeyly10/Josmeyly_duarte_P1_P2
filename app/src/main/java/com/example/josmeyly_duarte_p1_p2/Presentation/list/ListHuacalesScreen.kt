@@ -1,19 +1,10 @@
 package com.example.josmeyly_duarte_p1_p2.Presentation.list
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,15 +14,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.room.Delete
 import com.example.josmeyly_duarte_p1_p2.domain.model.Huacales
 
 @Composable
 fun ListHuacalesScreen(
-    viewModel: ListHuacalesViewModel = hiltViewModel()
+    viewModel: ListHuacalesViewModel = hiltViewModel(),
+    onNavigateToEdit: (Int) -> Unit,
+    onNavigateToCreate: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    ListHuacalesBody(state, viewModel::onEvent)
+
+    // 🔹 Detectar eventos de navegación
+    state.navigateToEditId?.let { id ->
+        onNavigateToEdit(id)
+        viewModel.onNavigationHandled()
+    }
+
+    if (state.navigationToCreate) {
+        onNavigateToCreate()
+        viewModel.onNavigationHandled()
+    }
+
+    ListHuacalesBody(
+        state = state,
+        onEvent = viewModel::onEvent
+    )
 }
 
 @Composable
@@ -47,6 +54,7 @@ fun ListHuacalesBody(
                     .testTag("loading")
             )
         }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -56,10 +64,20 @@ fun ListHuacalesBody(
             items(state.huacales) { huacal ->
                 HuacalesCard(
                     huacales = huacal,
-                    onEdit = { onEvent(ListHuacalesUiEvent.Edit(huacal.     IdEntrada)) },
+                    onEdit = { onEvent(ListHuacalesUiEvent.Edit(huacal.IdEntrada)) },
                     onDelete = { onEvent(ListHuacalesUiEvent.Delete(huacal.IdEntrada)) }
                 )
             }
+        }
+
+        // 🔹 Botón flotante para crear nuevo huacal
+        FloatingActionButton(
+            onClick = { onEvent(ListHuacalesUiEvent.CreateNew) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Text("+")
         }
     }
 }
@@ -87,14 +105,8 @@ fun HuacalesCard(
                 Text(huacales.NombreCliente, style = MaterialTheme.typography.titleMedium)
                 Text("Cantidad: ${huacales.Cantidad}")
             }
-            TextButton(
-                onClick = onEdit,
-                modifier = Modifier.testTag("edit_button_${huacales.IdEntrada}")
-            ) { Text("Editar") }
-            TextButton(
-                onClick = onDelete,
-                modifier = Modifier.testTag("delete_button_${huacales.IdEntrada}")
-            ) { Text("Eliminar") }
+            TextButton(onClick = onEdit) { Text("Editar") }
+            TextButton(onClick = onDelete) { Text("Eliminar") }
         }
     }
 }
@@ -104,8 +116,8 @@ fun HuacalesCard(
 private fun ListHuacalesBodyPreview() {
     val state = ListHuacalesUiState(
         huacales = listOf(
-            Huacales(1, "Juan", 5),
-            Huacales(2, "Maria", 10)
+            Huacales(IdEntrada = 1, NombreCliente = "Juan", Cantidad = 5, Fecha = "2025-10-06", Precio = 100),
+            Huacales(IdEntrada = 2, NombreCliente = "Maria", Cantidad = 10, Fecha = "2025-10-06", Precio = 200)
         ),
         isLoading = false
     )

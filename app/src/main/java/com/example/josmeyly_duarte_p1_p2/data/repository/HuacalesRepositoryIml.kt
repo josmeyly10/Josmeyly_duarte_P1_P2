@@ -1,5 +1,6 @@
 package com.example.josmeyly_duarte_p1_p2.data.repository
 
+import android.util.Log
 import com.example.josmeyly_duarte_p1_p2.data.local.dao.HuacalesDao
 import com.example.josmeyly_duarte_p1_p2.data.mapper.toEntity
 import com.example.josmeyly_duarte_p1_p2.domain.model.Huacales
@@ -14,15 +15,17 @@ import javax.inject.Inject
         private val dao: HuacalesDao
     ) : HuacalesRepository {
 
-        override fun observeHuacales(): Flow<List<Huacales>> = dao.observeALL().map { list ->
-            list.map { it.toDomain() }
-        }
+        override fun observeHuacales(): Flow<List<Huacales>> =
+            dao.observeAll().map { list ->
+                Log.d("HuacalesRepository", "Room devolvió ${list.size} registros")
+                list.map { it.toDomain() }
+            }
 
         override suspend fun getHuacales(id: Int?): Huacales? = dao.getById(id)?.toDomain()
 
         override suspend fun upsert(huacales: Huacales): Int {
-            dao.upsert(huacales.toEntity())
-            return huacales.IdEntrada
+            val id = dao.upsert(huacales.toEntity())
+            return id.toInt()
         }
 
         override suspend fun delete(id: Int): Unit {

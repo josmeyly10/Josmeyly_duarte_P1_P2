@@ -10,7 +10,7 @@ import com.example.josmeyly_duarte_p1_p2.data.local.entities.HuacalesEntity
         entities = [
             HuacalesEntity::class
         ],
-        version = 1,
+        version = 4,
         exportSchema = false
     )
     abstract class HuacalesDb : RoomDatabase(){

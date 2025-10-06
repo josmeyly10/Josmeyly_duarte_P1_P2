@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.registrojugadores"
+    namespace = "com.example.josmeyly_duarte_p1_p2"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.registrojugadores"
+        applicationId = "com.example.josmeyly_duarte_p1_p2"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -45,6 +45,7 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2") // <<<<<< Agregada
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -59,7 +60,7 @@ dependencies {
     // Serialization
     implementation(libs.kotlin.serialization.json)
 
-    // Room - CORREGIDO: eliminé la duplicación
+    // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.androidx.room.ktx)
